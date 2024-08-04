@@ -5,7 +5,7 @@ class Game():
     
     def __init__(self) -> None:
         pygame.init()
-        self.screen = pygame.display.set_mode((ancho,alto))
+        self.screen = pygame.display.set_mode((ancho,alto),pygame.FULLSCREEN)
         pygame.display.set_caption("Plataformas")
         self.reloj = pygame.time.Clock()
         self.etapa = "level 1"
@@ -15,16 +15,18 @@ class Game():
         for eventos in pygame.event.get():
             if eventos.type == pygame.QUIT:
                 self.runnig = False
+            if eventos.type == pygame.KEYDOWN:
+                if eventos.key == pygame.K_ESCAPE:
+                    self.runnig = False
 
     def dibujar(self):
         if self.etapa == "level 1":
             lvl1.dibujar(self.screen)
-        
         pygame.display.flip()
 
     def game(self):
         while self.runnig:
-            self.manejo_evento
+            self.manejo_evento()
             
             self.reloj.tick(60)
             
