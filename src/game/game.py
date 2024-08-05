@@ -19,8 +19,11 @@ class Game():
                 if eventos.key == pygame.K_ESCAPE:
                     self.runnig = False
                 elif eventos.key == pygame.K_SPACE:
-                    if jugador.colision_suelo(jugador.nivel_actual):
+                    arriba,_,_,_ =  jugador.colision_orientacion(jugador.nivel_actual)
+                    if not jugador.en_salto and arriba:
+                        jugador.posicion_inicial_salto = jugador.obtener_posicion_arriba(jugador.nivel_actual)
                         jugador.angulo = 0.1
+                        jugador.en_salto = True
 
     def dibujar(self):
         if self.etapa == "level 1":

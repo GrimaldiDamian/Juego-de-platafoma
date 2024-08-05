@@ -16,9 +16,9 @@ class Niveles(pygame.sprite.Sprite):
         bloques_con_colision = {"solidos": [], "monedas": [], "llaves": [], "puerta": []}
         for y,filas in enumerate(archivo):
             for x,bloque in enumerate(filas):
-                if int(bloque) in [0,1,2,3,10,11,12,13,20,21,22,23,30,31,32,33]:
-                    rectangulo = pygame.Rect(x*32,y*32,32,32)
-                    bloques_con_colision["solidos"].append(rectangulo)
+                if bloque in ["0","1","2","3","10","11","12","13","20","21","22","23","30","31","32","33"]:
+                    posiciones = (x*32,y*32)
+                    bloques_con_colision["solidos"].append(posiciones)
         return bloques_con_colision
 
     def carga_sprites(self):
