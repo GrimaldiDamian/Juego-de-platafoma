@@ -19,10 +19,8 @@ class Player():
         self.salto()
         if not self.colision_suelo(self.nivel_actual):
             self.rectangulo.y += 10
-        # elif self.colision_suelo(self.nivel_actual):
-        #     pass
-        # else:
-        #     self.rectangulo.y += 10
+        else:
+            pass
 
     def salto(self):
         self.rectangulo.y = self.posicion_inicial_salto - (math.sin(self.angulo) * 64)
