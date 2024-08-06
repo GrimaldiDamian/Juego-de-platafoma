@@ -1,5 +1,6 @@
 import pygame
 import csv
+from config import *
 
 class Niveles(pygame.sprite.Sprite):
 
@@ -17,7 +18,7 @@ class Niveles(pygame.sprite.Sprite):
         for y,filas in enumerate(archivo):
             for x,bloque in enumerate(filas):
                 if bloque in ["0","1","2","3","10","11","12","13","20","21","22","23","30","31","32","33"]:
-                    posiciones = (x*32,y*32)
+                    posiciones = (x*tamaño_sprite,y*tamaño_sprite)
                     bloques_con_colision["solidos"].append(posiciones)
         return bloques_con_colision
 
@@ -29,7 +30,7 @@ class Niveles(pygame.sprite.Sprite):
         for filas in range(10):
             lista_sprite = []
             for columnas in range(10):
-                sprite = pygame.Rect(32 * columnas, 32 * filas,32,32)
+                sprite = pygame.Rect(tamaño_sprite * columnas, tamaño_sprite * filas,tamaño_sprite,tamaño_sprite)
                 lista_sprite.append(self.imagen.subsurface(sprite))
             sprites.append(lista_sprite)
         return sprites
@@ -55,8 +56,8 @@ class Niveles(pygame.sprite.Sprite):
                 sprite_row = tile_index // 10
                 sprite_col = tile_index % 10
                 screen.blit(self.sprites[sprite_row][sprite_col], (x, y))
-                x+=32
-            y+=32
+                x+=tamaño_sprite
+            y+=tamaño_sprite
 
     def dibujar(self,screen):
         screen.blit(self.fondo,(0,0))

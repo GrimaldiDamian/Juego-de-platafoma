@@ -1,11 +1,12 @@
 import pygame
 from config import *
+from src.game.utils.utilidades import *
 
 class Game():
     
     def __init__(self) -> None:
         pygame.init()
-        self.screen = pygame.display.set_mode((ancho,alto))
+        self.screen = pygame.display.set_mode((ancho,alto),pygame.FULLSCREEN)
         pygame.display.set_caption("Plataformas")
         self.reloj = pygame.time.Clock()
         self.etapa = "level 1"
@@ -19,11 +20,12 @@ class Game():
                 if eventos.key == pygame.K_ESCAPE:
                     self.runnig = False
                 elif eventos.key == pygame.K_SPACE:
-                    arriba,_,_,_ =  jugador.colision_orientacion(jugador.nivel_actual)
-                    if not jugador.en_salto and arriba:
-                        jugador.posicion_inicial_salto = jugador.obtener_posicion_arriba(jugador.nivel_actual)
-                        jugador.angulo = 0.1
-                        jugador.en_salto = True
+                    if self.etapa not in ["menu","game_over"]:
+                        arriba,_,_,_ =  jugador.colision_orientacion(jugador.nivel_actual)
+                        if not jugador.en_salto and arriba:
+                            jugador.posicion_inicial_salto = jugador.obtener_posicion_arriba(jugador.nivel_actual)
+                            jugador.angulo = 0.1
+                            jugador.en_salto = True
 
     def dibujar(self):
         if self.etapa == "level 1":
@@ -38,5 +40,9 @@ class Game():
             self.reloj.tick(60)
 
             jugador.movimiento(pygame.key.get_pressed())
+            # if jugador.game_over():
+            #     self.etapa = "menu"
+            
+            jugador.perder_vida()
             
             self.dibujar()
