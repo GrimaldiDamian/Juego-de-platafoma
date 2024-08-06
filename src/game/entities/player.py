@@ -14,6 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.rectangulo = pygame.Rect(x,y,16,24)
         self.angulo = 0
         self.vidas = 3
+        self.coins = 0
         self.nivel_actual = None
         self.posicion_inicial_salto = 320
         self.en_salto = False
@@ -136,6 +137,17 @@ class Player(pygame.sprite.Sprite):
                 return x - self.rectangulo.width
         return self.rectangulo.x
 
+    def colision_monedas(self,nivel):
+        for monedas in nivel.colision_monedas["monedas"]:
+            x,y = monedas
+            rect = pygame.rect.Rect(x,y,tamaño_sprite,tamaño_sprite)
+            if self.rectangulo.colliderect(rect):
+                self.coins +=5
+                nivel.colision_monedas["monedas"].remove((x,y))
+                matriz_x = x // tamaño_sprite
+                matriz_y = y // tamaño_sprite
+                nivel.monedas[matriz_y][matriz_x] = -1
+
     def resetear_nivel(self):
         x,y = self.posicion_inicial_nivel[self.nivel]
         self.rectangulo.x = x
@@ -150,11 +162,21 @@ class Player(pygame.sprite.Sprite):
         return self.vidas == 0
 
     def dibujar_corazones(self,screen):
-        for i in range(self.vidas):
-            screen.blit(self.corazones_sprite[0][1], (i*tamaño_sprite, 0))
-        for i in range(3-self.vidas,0,-1):
-            screen.blit(self.corazones_sprite[0][0], ((3-i)*tamaño_sprite, 0))
+        tamaño_sprite = self.corazones_sprite[0][0].get_width()
+        espacio = tamaño_sprite * 1.2
 
-    def dibujar(self,screen):
+        for i in range(3):
+            if i < self.vidas:
+                sprite = self.corazones_sprite[0][1]
+            else:
+                sprite = self.corazones_sprite[0][0]
+            screen.blit(sprite, (i * espacio, 0))
+    
+    def dibujar_coins(self,screen,texto,fuente):
+        texto = fuente.render(texto,True,(255,255,255))
+        screen.blit(texto,(ancho//2, 0))
+
+    def dibujar(self,screen,fuente):
         pygame.draw.rect(screen,"red",self.rectangulo)
         self.dibujar_corazones(screen)
+        self.dibujar_coins(screen,f"Puntos: {self.coins}",fuente)

@@ -11,6 +11,7 @@ class Game():
         self.reloj = pygame.time.Clock()
         self.etapa = "level 1"
         self.runnig = True
+        self.fuente = pygame.font.SysFont('Times New Roman', tamaño_letras)
 
     def manejo_evento(self):
         for eventos in pygame.event.get():
@@ -30,7 +31,7 @@ class Game():
     def dibujar(self):
         if self.etapa == "level 1":
             lvl1.dibujar(self.screen)
-            jugador.dibujar(self.screen)
+            jugador.dibujar(self.screen,self.fuente)
         pygame.display.flip()
 
     def game(self):
@@ -43,6 +44,7 @@ class Game():
             # if jugador.game_over():
             #     self.etapa = "menu"
             
+            jugador.colision_monedas(jugador.nivel_actual)
             jugador.perder_vida()
             
             self.dibujar()
