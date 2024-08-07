@@ -4,19 +4,28 @@ from config import *
 
 class Niveles(pygame.sprite.Sprite):
 
-    def __init__(self, nombre_mapa,monedas,fondo) -> None:
+    def __init__(self, nombre_mapa,monedas,puertas,fondo) -> None:
         super().__init__()
         self.x = 0
         self.x_relativa = 0
+
+        #archivos necesarios
         self.mapa_nivel = nombre_mapa
         self.mapa_monedas = monedas
+        self.mapa_puertas = puertas
         self.suelo = self.abrir_archivo(self.mapa_nivel)
         self.monedas = self.abrir_archivo(self.mapa_monedas)
+        self.puertas = self.abrir_archivo(self.mapa_puertas)
+
+        #sprites
         self.imagen = pygame.image.load("assets/imagenes/sprite mapa.png")
         self.fondo = pygame.image.load(fondo)
         self.sprites = self.carga_sprites()
+
+        #colisiones
         self.suelo_colision = self.bloques_colision(self.suelo,"solidos")
         self.colision_monedas = self.bloques_colision(self.monedas,"monedas")
+        self.colision_puertas = self.bloques_colision(self.puertas,"puertas")
 
     def bloques_colision(self,archivo,tipo_objeto):
         bloques_con_colision = {tipo_objeto: []}
@@ -49,7 +58,7 @@ class Niveles(pygame.sprite.Sprite):
 
         return filas
 
-    def dibujar_mapa(self,screen,archivo):
+    def dibujar_elementos_nivel(self,screen,archivo):
         """
         Esta funcion sirve para dibujar todos los elementos del mapa, a traves de una matriz.
         """
@@ -71,5 +80,6 @@ class Niveles(pygame.sprite.Sprite):
         self.x -=1
         if self.x_relativa < ancho:
             screen.blit(self.fondo,(self.x_relativa,0))
-        self.dibujar_mapa(screen,self.suelo)
-        self.dibujar_mapa(screen,self.monedas)
+        self.dibujar_elementos_nivel(screen,self.suelo)
+        self.dibujar_elementos_nivel(screen,self.monedas)
+        self.dibujar_elementos_nivel(screen,self.puertas)

@@ -9,7 +9,7 @@ class Game():
         self.screen = pygame.display.set_mode((ancho,alto),pygame.FULLSCREEN)
         pygame.display.set_caption("Plataformas")
         self.reloj = pygame.time.Clock()
-        self.etapa = "level 1"
+        self.etapa = "nivel"
         self.runnig = True
         self.fuente = pygame.font.SysFont('Times New Roman', tamaño_letras)
 
@@ -27,16 +27,26 @@ class Game():
                         self.etapa = "pause"
                 elif eventos.key == pygame.K_SPACE:
                     if self.etapa not in ["menu","game_over","pause"]:
-                        arriba,_,_,_ =  jugador.colision_orientacion(jugador.nivel_actual)
+                        arriba,_,_,_ =  jugador.colision_orientacion(jugador.nivel_actual.suelo_colision,"solidos")
                         if not jugador.en_salto and arriba:
                             jugador.posicion_inicial_salto = jugador.obtener_posicion_arriba(jugador.nivel_actual)
                             jugador.angulo = 0.1
                             jugador.en_salto = True
+                if jugador.colision_puertas(jugador.nivel_actual):
+                    if eventos.key == pygame.K_e:
+                        siguiente_nivel = int(jugador.nivel)+1
+                        if siguiente_nivel <= total_niveles:
+                            jugador.nivel = f"{siguiente_nivel}"
+                            jugador.resetear_variables()
+                        else:
+                            self.etapa = "menu"
 
     def dibujar(self):
         if self.etapa not in ["menu","game_over","pause"]:
-            lvl1.dibujar(self.screen)
+            jugador.nivel_actual.dibujar(self.screen)
             jugador.dibujar(self.screen,self.fuente)
+            jugador.siguiente_nivel(self.screen,self.fuente)
+
         pygame.display.flip()
 
     def mecanica_jugador(self):

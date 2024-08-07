@@ -1,5 +1,9 @@
 from src.game.levels.level import Niveles
 from src.game.entities.player import *
 jugador = Player()
-lvl1 = Niveles("src/game/levels/LEVEL1/mapa_suelo.csv","src/game/levels/LEVEL1/mapa_monedas.csv","src/game/levels/LEVEL1/BACKGROUND.png")
-jugador.nivel_actual = lvl1
+
+def obtener_nivel_actual():
+    nivel = Niveles(f"src/game/levels/LEVEL{jugador.nivel}/mapa_suelo.csv",f"src/game/levels/LEVEL{jugador.nivel}/mapa_monedas.csv",f"src/game/levels/LEVEL{jugador.nivel}/mapa_puertas.csv",f"src/game/levels/LEVEL{jugador.nivel}/BACKGROUND.png")
+    return nivel
+
+jugador.nivel_actual = obtener_nivel_actual()

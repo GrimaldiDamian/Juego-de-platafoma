@@ -6,9 +6,8 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self) -> None:
         super().__init__()
-        self.posicion_inicial_nivel = {"1" : (0,584)}
         self.nivel = "1"
-        x,y = self.posicion_inicial_nivel[self.nivel]
+        x,y = posicion_inicial_nivel[self.nivel]
         self.corazones = pygame.image.load("assets/imagenes/corazones.png")
         self.corazones_sprite = self.sprite(self.corazones)
         self.rectangulo = pygame.Rect(x,y,16,24)
@@ -33,7 +32,7 @@ class Player(pygame.sprite.Sprite):
         return sprites
 
     def movimiento(self,key):
-        arriba, abajo, izquierda, derecha = self.colision_orientacion(self.nivel_actual)
+        arriba, _, izquierda, derecha = self.colision_orientacion(self.nivel_actual.suelo_colision,"solidos")
         if key[pygame.K_d] and not derecha:
             self.rectangulo.x += velocidad
         if key[pygame.K_a] and not izquierda:
@@ -57,7 +56,7 @@ class Player(pygame.sprite.Sprite):
 
     def salto(self):
         self.rectangulo.y = self.posicion_inicial_salto - (math.sin(self.angulo) * (tamaño_sprite*2.2))
-        arriba,abajo,_,_ = self.colision_orientacion(self.nivel_actual)
+        arriba,abajo,_,_ = self.colision_orientacion(self.nivel_actual.suelo_colision,"solidos")
         if self.angulo > 0:
             self.angulo += 0.1
         if self.angulo >= math.pi:
@@ -71,10 +70,10 @@ class Player(pygame.sprite.Sprite):
                 self.angulo = 0
                 self.en_salto = False
 
-    def colision_orientacion(self, nivel):
+    def colision_orientacion(self, archivo, objeto):
         arriba, abajo, izquierda, derecha = False, False, False, False
 
-        for suelo in nivel.suelo_colision["solidos"]:
+        for suelo in archivo[objeto]:
             x, y = suelo
 
             # Detectar si el jugador está justo encima del bloque
@@ -148,15 +147,27 @@ class Player(pygame.sprite.Sprite):
                 matriz_y = y // tamaño_sprite
                 nivel.monedas[matriz_y][matriz_x] = -1
 
-    def resetear_nivel(self):
-        x,y = self.posicion_inicial_nivel[self.nivel]
+    def resetear_variables(self):
+        x,y = posicion_inicial_nivel[self.nivel]
         self.rectangulo.x = x
         self.rectangulo.y = y
+
+    def colision_puertas(self,nivel):
+        for puertas in nivel.colision_puertas["puertas"]:
+            x,y = puertas
+            rect = pygame.rect.Rect(x,y,tamaño_sprite,tamaño_sprite)
+            if self.rectangulo.colliderect(rect):
+                return True
+        return False
+
+    def siguiente_nivel(self,screen,fuente):
+        if self.colision_puertas(self.nivel_actual):
+            self.dibujar_texto(screen,"Presione 'e' para continuar",fuente,self.rectangulo.x,self.rectangulo.y - tamaño_letras)
 
     def perder_vida(self):
         if self.rectangulo.y == alto - self.rectangulo.height:
             self.vidas -=1
-            self.resetear_nivel()
+            self.resetear_variables()
 
     def game_over(self):
         return self.vidas == 0
@@ -172,11 +183,11 @@ class Player(pygame.sprite.Sprite):
                 sprite = self.corazones_sprite[0][0]
             screen.blit(sprite, (i * espacio, 0))
     
-    def dibujar_coins(self,screen,texto,fuente):
-        texto = fuente.render(texto,True,(255,255,255))
-        screen.blit(texto,(ancho//2, 0))
+    def dibujar_texto(self,screen,texto,fuente,x,y):
+        texto = fuente.render(texto,True,(0,0,0))
+        screen.blit(texto,(x,y))
 
     def dibujar(self,screen,fuente):
         pygame.draw.rect(screen,"red",self.rectangulo)
         self.dibujar_corazones(screen)
-        self.dibujar_coins(screen,f"Puntos: {self.coins}",fuente)
+        self.dibujar_texto(screen,f"Puntos: {self.coins}",fuente,ancho//2,0)
