@@ -6,6 +6,8 @@ class Niveles(pygame.sprite.Sprite):
 
     def __init__(self, nombre_mapa,monedas,fondo) -> None:
         super().__init__()
+        self.x = 0
+        self.x_relativa = 0
         self.mapa_nivel = nombre_mapa
         self.mapa_monedas = monedas
         self.suelo = self.abrir_archivo(self.mapa_nivel)
@@ -20,10 +22,7 @@ class Niveles(pygame.sprite.Sprite):
         bloques_con_colision = {tipo_objeto: []}
         for y,filas in enumerate(archivo):
             for x,bloque in enumerate(filas):
-                if bloque in ["0","1","2","3","10","11","12","13","20","21","22","23","30","31","32","33"]:
-                    posiciones = (x*tamaño_sprite,y*tamaño_sprite)
-                    bloques_con_colision[tipo_objeto].append(posiciones)
-                elif bloque in ["4"]:
+                if bloque !="-1":
                     posiciones = (x*tamaño_sprite,y*tamaño_sprite)
                     bloques_con_colision[tipo_objeto].append(posiciones)
         return bloques_con_colision
@@ -67,6 +66,10 @@ class Niveles(pygame.sprite.Sprite):
             y+=tamaño_sprite
 
     def dibujar(self,screen):
-        screen.blit(self.fondo,(0,0))
+        self.x_relativa = self.x % ancho
+        screen.blit(self.fondo,(self.x_relativa - ancho,0))
+        self.x -=1
+        if self.x_relativa < ancho:
+            screen.blit(self.fondo,(self.x_relativa,0))
         self.dibujar_mapa(screen,self.suelo)
         self.dibujar_mapa(screen,self.monedas)

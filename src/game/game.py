@@ -19,9 +19,14 @@ class Game():
                 self.runnig = False
             if eventos.type == pygame.KEYDOWN:
                 if eventos.key == pygame.K_ESCAPE:
-                    self.runnig = False
+                    if self.etapa == "menu":
+                        self.runnig = False
+                    elif self.etapa == "pause":
+                        self.etapa = "nivel"
+                    else:
+                        self.etapa = "pause"
                 elif eventos.key == pygame.K_SPACE:
-                    if self.etapa not in ["menu","game_over"]:
+                    if self.etapa not in ["menu","game_over","pause"]:
                         arriba,_,_,_ =  jugador.colision_orientacion(jugador.nivel_actual)
                         if not jugador.en_salto and arriba:
                             jugador.posicion_inicial_salto = jugador.obtener_posicion_arriba(jugador.nivel_actual)
@@ -29,10 +34,20 @@ class Game():
                             jugador.en_salto = True
 
     def dibujar(self):
-        if self.etapa == "level 1":
+        if self.etapa not in ["menu","game_over","pause"]:
             lvl1.dibujar(self.screen)
             jugador.dibujar(self.screen,self.fuente)
         pygame.display.flip()
+
+    def mecanica_jugador(self):
+        if self.etapa not in ["menu","game_over","pause"]:
+            jugador.movimiento(pygame.key.get_pressed())
+
+            # if jugador.game_over():
+            #     self.etapa = "menu"
+
+            jugador.colision_monedas(jugador.nivel_actual)
+            jugador.perder_vida()
 
     def game(self):
         while self.runnig:
@@ -40,11 +55,6 @@ class Game():
             
             self.reloj.tick(60)
 
-            jugador.movimiento(pygame.key.get_pressed())
-            # if jugador.game_over():
-            #     self.etapa = "menu"
-            
-            jugador.colision_monedas(jugador.nivel_actual)
-            jugador.perder_vida()
+            self.mecanica_jugador()
             
             self.dibujar()

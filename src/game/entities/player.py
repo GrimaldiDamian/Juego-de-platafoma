@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self) -> None:
         super().__init__()
-        self.posicion_inicial_nivel = {"1" : (384,320)}
+        self.posicion_inicial_nivel = {"1" : (0,584)}
         self.nivel = "1"
         x,y = self.posicion_inicial_nivel[self.nivel]
         self.corazones = pygame.image.load("assets/imagenes/corazones.png")
@@ -33,30 +33,30 @@ class Player(pygame.sprite.Sprite):
         return sprites
 
     def movimiento(self,key):
-        if key[pygame.K_d]:
-            self.rectangulo.x += 5
-        if key[pygame.K_a]:
-            self.rectangulo.x -= 5
-
         arriba, abajo, izquierda, derecha = self.colision_orientacion(self.nivel_actual)
+        if key[pygame.K_d] and not derecha:
+            self.rectangulo.x += velocidad
+        if key[pygame.K_a] and not izquierda:
+            self.rectangulo.x -= velocidad
+
         if self.en_salto:
             self.salto()
         else:
-            if not arriba:
-                self.rectangulo.y += 5
-        if arriba:
-            self.rectangulo.y = self.obtener_posicion_arriba(self.nivel_actual)
-        if derecha:
-            self.rectangulo.x = self.obtener_posicion_derecha(self.nivel_actual)
-        if izquierda:
-            self.rectangulo.x = self.obtener_posicion_izquierda(self.nivel_actual)
+            if arriba:
+                self.rectangulo.y = min(self.obtener_posicion_arriba(self.nivel_actual), self.rectangulo.y)
+            else:
+                self.rectangulo.y += gravedad
 
-        self.rectangulo.x = max(0,self.rectangulo.x)
-        self.rectangulo.x = min(self.rectangulo.x, ancho - self.rectangulo.width)
+        self.rectangulo.x = max(0, min(self.rectangulo.x, ancho - self.rectangulo.width))
         self.rectangulo.y = min(alto - self.rectangulo.height, self.rectangulo.y)
 
+        if derecha:
+            self.rectangulo.x = min(self.obtener_posicion_derecha(self.nivel_actual), self.rectangulo.x)
+        if izquierda:
+            self.rectangulo.x = max(self.obtener_posicion_izquierda(self.nivel_actual), self.rectangulo.x)
+
     def salto(self):
-        self.rectangulo.y = self.posicion_inicial_salto - (math.sin(self.angulo) * (tamaño_sprite*2))
+        self.rectangulo.y = self.posicion_inicial_salto - (math.sin(self.angulo) * (tamaño_sprite*2.2))
         arriba,abajo,_,_ = self.colision_orientacion(self.nivel_actual)
         if self.angulo > 0:
             self.angulo += 0.1
@@ -79,28 +79,28 @@ class Player(pygame.sprite.Sprite):
 
             # Detectar si el jugador está justo encima del bloque
             if (self.rectangulo.y + self.rectangulo.height >= y and 
-                self.rectangulo.y + self.rectangulo.height <= y + 5) and (
+                self.rectangulo.y + self.rectangulo.height <= y + gravedad) and (
                 self.rectangulo.x + self.rectangulo.width > x and 
                 self.rectangulo.x < x + tamaño_sprite):
                 arriba = True
 
             # Detectar si el jugador está justo debajo del bloque
             if (self.rectangulo.y <= y + tamaño_sprite and 
-                self.rectangulo.y >= y + tamaño_sprite - 5) and (
+                self.rectangulo.y >= y + tamaño_sprite - gravedad) and (
                 self.rectangulo.x + self.rectangulo.width > x and 
                 self.rectangulo.x < x + tamaño_sprite):
                 abajo = True
             
             # Detectar colisiones a la izquierda
             if (self.rectangulo.x <= x + tamaño_sprite and 
-                self.rectangulo.x >= x + tamaño_sprite - 5) and (
+                self.rectangulo.x >= x + tamaño_sprite - velocidad) and (
                 self.rectangulo.y + self.rectangulo.height > y and 
                 self.rectangulo.y < y + tamaño_sprite):
                 izquierda = True
 
             # Detectar colisiones a la derecha
             if (self.rectangulo.x + self.rectangulo.width >= x and 
-                self.rectangulo.x + self.rectangulo.width <= x + 5) and (
+                self.rectangulo.x + self.rectangulo.width <= x + velocidad) and (
                 self.rectangulo.y + self.rectangulo.height > y and 
                 self.rectangulo.y < y + tamaño_sprite):
                 derecha = True
@@ -111,7 +111,7 @@ class Player(pygame.sprite.Sprite):
         for suelo in nivel.suelo_colision["solidos"]:
             x,y = suelo
             if (self.rectangulo.y + self.rectangulo.height >= y and 
-                self.rectangulo.y + self.rectangulo.height <= y + 5) and (
+                self.rectangulo.y + self.rectangulo.height <= y + gravedad) and (
                 self.rectangulo.x + self.rectangulo.width > x and 
                 self.rectangulo.x < x + tamaño_sprite):
                 return y - self.rectangulo.height
@@ -121,7 +121,7 @@ class Player(pygame.sprite.Sprite):
         for suelo in nivel.suelo_colision["solidos"]:
             x, y = suelo
             if (self.rectangulo.x <= x + tamaño_sprite and 
-                self.rectangulo.x >= x + tamaño_sprite - 5) and (
+                self.rectangulo.x >= x + tamaño_sprite - velocidad) and (
                 self.rectangulo.y + self.rectangulo.height > y and 
                 self.rectangulo.y < y + tamaño_sprite):
                 return x + tamaño_sprite
@@ -131,7 +131,7 @@ class Player(pygame.sprite.Sprite):
         for suelo in nivel.suelo_colision["solidos"]:
             x, y = suelo
             if (self.rectangulo.x + self.rectangulo.width >= x and 
-                self.rectangulo.x + self.rectangulo.width <= x + 5) and (
+                self.rectangulo.x + self.rectangulo.width <= x + velocidad) and (
                 self.rectangulo.y + self.rectangulo.height > y and 
                 self.rectangulo.y < y + tamaño_sprite):
                 return x - self.rectangulo.width
