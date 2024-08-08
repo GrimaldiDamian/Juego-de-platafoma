@@ -6,11 +6,25 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self) -> None:
         super().__init__()
+
+        #nivel inicial
         self.nivel = "1"
-        x,y = posicion_inicial_nivel[self.nivel]
+        
+        #carga de imagenes
         self.corazones = pygame.image.load("assets/imagenes/corazones.png")
+        self.personaje = pygame.image.load("assets/imagenes/SPRITE PERSONAJE.png")
+        self.en_movimiento = False
+        self.direccion = 0
+        self.sprite_actual = 0
+
+        #carga de sprite
         self.corazones_sprite = self.sprite(self.corazones)
-        self.rectangulo = pygame.Rect(x,y,16,24)
+        self.personaje_sprite = self.sprite(self.personaje)
+
+        #bitbox
+        x,y = posicion_inicial_nivel[self.nivel]
+        self.rectangulo = pygame.Rect(x,y,ancho_jugador,alto_jugador)
+
         self.angulo = 0
         self.vidas = 3
         self.coins = 0
@@ -33,10 +47,17 @@ class Player(pygame.sprite.Sprite):
 
     def movimiento(self,key):
         arriba, _, izquierda, derecha = self.colision_orientacion(self.nivel_actual.suelo_colision,"solidos")
+        self.en_movimiento = False
         if key[pygame.K_d] and not derecha:
             self.rectangulo.x += velocidad
+            self.direccion = 0
+            self.sprite_actual += 1
+            self.en_movimiento = True
         if key[pygame.K_a] and not izquierda:
             self.rectangulo.x -= velocidad
+            self.direccion = 1
+            self.sprite_actual += 1
+            self.en_movimiento = True
 
         if self.en_salto:
             self.salto()
@@ -151,6 +172,7 @@ class Player(pygame.sprite.Sprite):
         x,y = posicion_inicial_nivel[self.nivel]
         self.rectangulo.x = x
         self.rectangulo.y = y
+        self.direccion = 0
 
     def colision_puertas(self,nivel):
         for puertas in nivel.colision_puertas["puertas"]:
@@ -160,7 +182,7 @@ class Player(pygame.sprite.Sprite):
                 return True
         return False
 
-    def siguiente_nivel(self,screen,fuente):
+    def interaccion_puerta(self,screen,fuente):
         if self.colision_puertas(self.nivel_actual):
             self.dibujar_texto(screen,"Presione 'e' para continuar",fuente,self.rectangulo.x,self.rectangulo.y - tamaño_letras)
 
@@ -173,7 +195,6 @@ class Player(pygame.sprite.Sprite):
         return self.vidas == 0
 
     def dibujar_corazones(self,screen):
-        tamaño_sprite = self.corazones_sprite[0][0].get_width()
         espacio = tamaño_sprite * 1.2
 
         for i in range(3):
@@ -187,7 +208,12 @@ class Player(pygame.sprite.Sprite):
         texto = fuente.render(texto,True,(0,0,0))
         screen.blit(texto,(x,y))
 
+    def dibujar_personaje(self,screen):
+        if self.sprite_actual > 2 or not self.en_movimiento:
+            self.sprite_actual = 0
+        screen.blit(self.personaje_sprite[self.direccion][self.sprite_actual],(self.rectangulo.x - 7, self.rectangulo.y -3))
+
     def dibujar(self,screen,fuente):
-        pygame.draw.rect(screen,"red",self.rectangulo)
+        self.dibujar_personaje(screen)
         self.dibujar_corazones(screen)
         self.dibujar_texto(screen,f"Puntos: {self.coins}",fuente,ancho//2,0)

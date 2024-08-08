@@ -38,6 +38,7 @@ class Game():
                         if siguiente_nivel <= total_niveles:
                             jugador.nivel = f"{siguiente_nivel}"
                             jugador.resetear_variables()
+                            jugador.nivel_actual = obtener_nivel_actual()
                         else:
                             self.etapa = "menu"
 
@@ -45,7 +46,7 @@ class Game():
         if self.etapa not in ["menu","game_over","pause"]:
             jugador.nivel_actual.dibujar(self.screen)
             jugador.dibujar(self.screen,self.fuente)
-            jugador.siguiente_nivel(self.screen,self.fuente)
+            jugador.interaccion_puerta(self.screen,self.fuente)
 
         pygame.display.flip()
 
