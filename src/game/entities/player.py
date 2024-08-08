@@ -192,7 +192,7 @@ class Player(pygame.sprite.Sprite):
             self.resetear_variables()
 
     def game_over(self):
-        return self.vidas == 0
+        return self.vidas == -1
 
     def dibujar_corazones(self,screen):
         espacio = tamaño_sprite * 1.2

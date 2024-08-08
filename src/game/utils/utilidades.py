@@ -1,5 +1,8 @@
 from src.game.levels.level import Niveles
 from src.game.entities.player import *
+from src.menu.menu import *
+
+menu = Menu()
 jugador = Player()
 
 def obtener_nivel_actual():

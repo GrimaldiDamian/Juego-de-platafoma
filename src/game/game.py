@@ -9,7 +9,7 @@ class Game():
         self.screen = pygame.display.set_mode((ancho,alto),pygame.FULLSCREEN)
         pygame.display.set_caption("Plataformas")
         self.reloj = pygame.time.Clock()
-        self.etapa = "nivel"
+        self.etapa = "menu"
         self.runnig = True
         self.fuente = pygame.font.SysFont('Times New Roman', tamaño_letras)
 
@@ -41,21 +41,34 @@ class Game():
                             jugador.nivel_actual = obtener_nivel_actual()
                         else:
                             self.etapa = "menu"
+            if eventos.type == pygame.MOUSEBUTTONDOWN:
+                click = eventos.button
+                if self.etapa == "menu":
+                    for boton in menu.botones:
+                        boton.accion(pygame.mouse,click,self)
 
     def dibujar(self):
+        """
+        Se encarga de dibujar los escenarios, ya sea pausa, menu, o los niveles
+        """
         if self.etapa not in ["menu","game_over","pause"]:
             jugador.nivel_actual.dibujar(self.screen)
             jugador.dibujar(self.screen,self.fuente)
             jugador.interaccion_puerta(self.screen,self.fuente)
+        elif self.etapa in ["menu","pause"]:
+            menu.dibujar(self,self.fuente,pygame.mouse)
 
         pygame.display.flip()
 
     def mecanica_jugador(self):
+        """
+        Se encarga de los movimientos, colisiones y del game over del personaje
+        """
         if self.etapa not in ["menu","game_over","pause"]:
             jugador.movimiento(pygame.key.get_pressed())
 
-            # if jugador.game_over():
-            #     self.etapa = "menu"
+            if jugador.game_over():
+                self.etapa = "menu"
 
             jugador.colision_monedas(jugador.nivel_actual)
             jugador.perder_vida()
