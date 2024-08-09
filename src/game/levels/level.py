@@ -18,7 +18,7 @@ class Niveles(pygame.sprite.Sprite):
         self.puertas = self.abrir_archivo(self.mapa_puertas)
 
         #sprites
-        self.imagen = pygame.image.load("assets/imagenes/sprite mapa.png")
+        self.imagen = pygame.image.load("./assets/imagenes/sprite mapa.png")
         self.fondo = pygame.image.load(fondo)
         self.sprites = self.carga_sprites()
 

@@ -4,7 +4,7 @@ from src.menu.boton import *
 
 class Menu():
     def __init__(self) -> None:
-        self.fondo = pygame.image.load("assets/imagenes/MENU.png")
+        self.fondo = pygame.image.load("./assets/imagenes/MENU.png")
         self.opciones = [("JUGAR", (ancho//2 - ancho_boton//2, alto//2 - alto_boton//2 - 50)),
                          ("SALIR", (ancho//2 - ancho_boton//2, alto//2 - alto_boton//2 + 50))]
         self.botones = []

@@ -11,8 +11,8 @@ class Player(pygame.sprite.Sprite):
         self.nivel = "1"
         
         #carga de imagenes
-        self.corazones = pygame.image.load("assets/imagenes/corazones.png")
-        self.personaje = pygame.image.load("assets/imagenes/SPRITE PERSONAJE.png")
+        self.corazones = pygame.image.load("./assets/imagenes/corazones.png")
+        self.personaje = pygame.image.load("./assets/imagenes/SPRITE PERSONAJE.png")
         self.en_movimiento = False
         self.direccion = 0
         self.sprite_actual = 0
