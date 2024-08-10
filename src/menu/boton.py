@@ -32,7 +32,12 @@ class Boton():
                     utilidades.jugador.nivel_actual = utilidades.obtener_nivel_actual()
                     screen.etapa = "nivel"
                 elif self.valor == "SALIR":
-                    screen.runnig = False
+                    if screen.etapa == "menu":
+                        screen.runnig = False
+                    else:
+                        screen.etapa = "menu"
+                else:
+                    screen.etapa = "nivel"
 
     def dibujar(self,screen,fuente,mouse):
 

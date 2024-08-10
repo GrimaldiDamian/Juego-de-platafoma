@@ -33,6 +33,9 @@ class Player(pygame.sprite.Sprite):
         self.en_salto = False
 
     def sprite(self,imagen):
+        """
+        Obtiene los sprite necesarios para ejecutar la animacion del jugador
+        """
         ancho,alto = imagen.get_size()
         cantidad_filas = alto // tamaño_sprite
         cantidad_columnas = ancho // tamaño_sprite
@@ -46,6 +49,9 @@ class Player(pygame.sprite.Sprite):
         return sprites
 
     def movimiento(self,key):
+        """
+        Cumple la funcion de que el personaje se mueva en todo el mapa
+        """
         arriba, _, izquierda, derecha = self.colision_orientacion(self.nivel_actual.suelo_colision,"solidos")
         self.en_movimiento = False
         if key[pygame.K_d] and not derecha:
@@ -63,7 +69,7 @@ class Player(pygame.sprite.Sprite):
             self.salto()
         else:
             if arriba:
-                self.rectangulo.y = min(self.obtener_posicion_arriba(self.nivel_actual), self.rectangulo.y)
+                self.rectangulo.y = min(self.obtener_posicion(self.nivel_actual,"arriba"), self.rectangulo.y)
             else:
                 self.rectangulo.y += gravedad
 
@@ -71,11 +77,14 @@ class Player(pygame.sprite.Sprite):
         self.rectangulo.y = min(alto - self.rectangulo.height, self.rectangulo.y)
 
         if derecha:
-            self.rectangulo.x = min(self.obtener_posicion_derecha(self.nivel_actual), self.rectangulo.x)
+            self.rectangulo.x = min(self.obtener_posicion(self.nivel_actual,"derecha"), self.rectangulo.x)
         if izquierda:
-            self.rectangulo.x = max(self.obtener_posicion_izquierda(self.nivel_actual), self.rectangulo.x)
+            self.rectangulo.x = max(self.obtener_posicion(self.nivel_actual,"izquierda"), self.rectangulo.x)
 
     def salto(self):
+        """
+        Mecanica de salto
+        """
         self.rectangulo.y = self.posicion_inicial_salto - (math.sin(self.angulo) * (tamaño_sprite*2.2))
         arriba,abajo,_,_ = self.colision_orientacion(self.nivel_actual.suelo_colision,"solidos")
         if self.angulo > 0:
@@ -92,6 +101,10 @@ class Player(pygame.sprite.Sprite):
                 self.en_salto = False
 
     def colision_orientacion(self, archivo, objeto):
+        """
+        Se obtiene en que direccion del bloque esta haciendo contacto el jugador.
+        Se espera recibir, uno de los 3 archivos que existen para cada nivel, el suelo, las monedas o el de la puerta y como objeto, el tipo de bloque que es
+        """
         arriba, abajo, izquierda, derecha = False, False, False, False
 
         for suelo in archivo[objeto]:
@@ -127,37 +140,49 @@ class Player(pygame.sprite.Sprite):
 
         return arriba, abajo, izquierda, derecha
 
-    def obtener_posicion_arriba(self,nivel):
-        for suelo in nivel.suelo_colision["solidos"]:
-            x,y = suelo
-            if (self.rectangulo.y + self.rectangulo.height >= y and 
-                self.rectangulo.y + self.rectangulo.height <= y + gravedad) and (
-                self.rectangulo.x + self.rectangulo.width > x and 
-                self.rectangulo.x < x + tamaño_sprite):
-                return y - self.rectangulo.height
-        return self.rectangulo.y
-
-    def obtener_posicion_izquierda(self, nivel):
+    def obtener_posicion(self, nivel, direccion):
+        """
+        Obtiene la posición del bloque según la dirección especificada.
+        
+        dirección: Puede ser 'arriba', 'izquierda', o 'derecha'.
+        """
         for suelo in nivel.suelo_colision["solidos"]:
             x, y = suelo
-            if (self.rectangulo.x <= x + tamaño_sprite and 
-                self.rectangulo.x >= x + tamaño_sprite - velocidad) and (
-                self.rectangulo.y + self.rectangulo.height > y and 
-                self.rectangulo.y < y + tamaño_sprite):
-                return x + tamaño_sprite
-        return self.rectangulo.x
-
-    def obtener_posicion_derecha(self, nivel):
-        for suelo in nivel.suelo_colision["solidos"]:
-            x, y = suelo
-            if (self.rectangulo.x + self.rectangulo.width >= x and 
-                self.rectangulo.x + self.rectangulo.width <= x + velocidad) and (
-                self.rectangulo.y + self.rectangulo.height > y and 
-                self.rectangulo.y < y + tamaño_sprite):
-                return x - self.rectangulo.width
-        return self.rectangulo.x
+            
+            if direccion == 'arriba':
+                if (self.rectangulo.y + self.rectangulo.height >= y and 
+                    self.rectangulo.y + self.rectangulo.height <= y + gravedad) and (
+                    self.rectangulo.x + self.rectangulo.width > x and 
+                    self.rectangulo.x < x + tamaño_sprite):
+                    return y - self.rectangulo.height
+            
+            elif direccion == 'izquierda':
+                if (self.rectangulo.x <= x + tamaño_sprite and 
+                    self.rectangulo.x >= x + tamaño_sprite - velocidad) and (
+                    self.rectangulo.y + self.rectangulo.height > y and 
+                    self.rectangulo.y < y + tamaño_sprite):
+                    return x + tamaño_sprite
+            
+            elif direccion == 'derecha':
+                if (self.rectangulo.x + self.rectangulo.width >= x and 
+                    self.rectangulo.x + self.rectangulo.width <= x + velocidad) and (
+                    self.rectangulo.y + self.rectangulo.height > y and 
+                    self.rectangulo.y < y + tamaño_sprite):
+                    return x - self.rectangulo.width
+        
+        # Si no hay colisión, se retorna la posición original dependiendo de la dirección
+        if direccion == 'arriba':
+            return self.rectangulo.y
+        elif direccion == 'izquierda':
+            return self.rectangulo.x
+        elif direccion == 'derecha':
+            return self.rectangulo.x
 
     def colision_monedas(self,nivel):
+        """
+        Se espera recibir el nivel actual
+        Se encarga de que si esta colisionando con las monedas, estas desaparezcan del nivel, y que se le sume a los puntos
+        """
         for monedas in nivel.colision_monedas["monedas"]:
             x,y = monedas
             rect = pygame.rect.Rect(x,y,tamaño_sprite,tamaño_sprite)
@@ -169,12 +194,18 @@ class Player(pygame.sprite.Sprite):
                 nivel.monedas[matriz_y][matriz_x] = -1
 
     def resetear_variables(self):
+        """
+        Funcion para resetear las variables, de posición, cuando muere o cuando cambia de nivel.
+        """
         x,y = posicion_inicial_nivel[self.nivel]
         self.rectangulo.x = x
         self.rectangulo.y = y
         self.direccion = 0
 
     def colision_puertas(self,nivel):
+        """
+        Se espera recibir como parametros, el nivel actual, y funciona para detectar si se esta colisionando con la puerta.
+        """
         for puertas in nivel.colision_puertas["puertas"]:
             x,y = puertas
             rect = pygame.rect.Rect(x,y,tamaño_sprite,tamaño_sprite)
@@ -187,6 +218,9 @@ class Player(pygame.sprite.Sprite):
             self.dibujar_texto(screen,"Presione 'e' para continuar",fuente,self.rectangulo.x,self.rectangulo.y - tamaño_letras)
 
     def perder_vida(self):
+        """
+        Funcion de cuando pierde vida, cuando el jugador cae al vacio.
+        """
         if self.rectangulo.y == alto - self.rectangulo.height:
             self.vidas -=1
             self.resetear_variables()

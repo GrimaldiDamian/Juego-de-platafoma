@@ -28,6 +28,9 @@ class Niveles(pygame.sprite.Sprite):
         self.colision_puertas = self.bloques_colision(self.puertas,"puertas")
 
     def bloques_colision(self,archivo,tipo_objeto):
+        """
+        Crea un diccionario, con los bloques que tienen colision y que tipo de colision es.
+        """
         bloques_con_colision = {tipo_objeto: []}
         for y,filas in enumerate(archivo):
             for x,bloque in enumerate(filas):
@@ -75,6 +78,9 @@ class Niveles(pygame.sprite.Sprite):
             y+=tamaño_sprite
 
     def dibujar(self,screen):
+        """
+        Se encarga de dibujar el nivel.
+        """
         self.x_relativa = self.x % ancho
         screen.blit(self.fondo,(self.x_relativa - ancho,0))
         self.x -=1
