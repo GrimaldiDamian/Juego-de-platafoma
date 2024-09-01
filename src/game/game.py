@@ -35,18 +35,20 @@ class Game():
                         arriba,_,_,_ =  jugador.colision_orientacion(jugador.nivel_actual.suelo_colision,"solidos")
                         if not jugador.en_salto and arriba:
                             jugador.posicion_inicial_salto = jugador.obtener_posicion(jugador.nivel_actual,"arriba")
-                            jugador.angulo = 0.1
+                            # jugador.angulo = 0.1
+                            jugador.tiempo = 0
                             jugador.en_salto = True
                 #Este if, se encarga de ver si esta en la puerta y si toca la e, cambia de nivel.
-                if jugador.colision_puertas(jugador.nivel_actual):
-                    if eventos.key == pygame.K_e:
-                        siguiente_nivel = int(jugador.nivel)+1
-                        if siguiente_nivel <= total_niveles:
-                            jugador.nivel = f"{siguiente_nivel}"
-                            jugador.resetear_variables()
-                            jugador.nivel_actual = obtener_nivel_actual()
-                        else:
-                            self.etapa = "menu"
+                if self.etapa == "nivel":
+                    if jugador.colision_puertas(jugador.nivel_actual):
+                        if eventos.key == pygame.K_e:
+                            siguiente_nivel = int(jugador.nivel)+1
+                            if siguiente_nivel <= total_niveles:
+                                jugador.nivel = f"{siguiente_nivel}"
+                                jugador.resetear_variables()
+                                jugador.nivel_actual = obtener_nivel_actual()
+                            else:
+                                self.etapa = "menu"
             if eventos.type == pygame.MOUSEBUTTONDOWN:
                 #sirve para el menu, dependiendo a que boton se este tocando, va a ejercer una accion u otra
                 click = eventos.button

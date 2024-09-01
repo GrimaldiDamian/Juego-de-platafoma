@@ -26,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.rectangulo = pygame.Rect(x,y,ancho_jugador,alto_jugador)
 
         self.angulo = 0
+        self.tiempo = 0
         self.vidas = 3
         self.coins = 0
         self.nivel_actual = None
@@ -81,23 +82,37 @@ class Player(pygame.sprite.Sprite):
         if izquierda:
             self.rectangulo.x = max(self.obtener_posicion(self.nivel_actual,"izquierda"), self.rectangulo.x)
 
+    # def salto(self):
+    #     """
+    #     Mecanica de salto
+    #     """
+    #     self.rectangulo.y = self.posicion_inicial_salto - (math.sin(self.angulo) * (tamaño_sprite*2.2))
+    #     arriba,abajo,_,_ = self.colision_orientacion(self.nivel_actual.suelo_colision,"solidos")
+    #     if self.angulo > 0:
+    #         self.angulo += 0.1
+    #     if self.angulo >= math.pi:
+    #         self.angulo = 0
+    #         self.en_salto = False
+    #     elif self.angulo < math.pi/2:
+    #         if abajo:
+    #             self.angulo = math.pi - self.angulo
+    #     else:
+    #         if arriba:
+    #             self.angulo = 0
+    #             self.en_salto = False
+
     def salto(self):
-        """
-        Mecanica de salto
-        """
-        self.rectangulo.y = self.posicion_inicial_salto - (math.sin(self.angulo) * (tamaño_sprite*2.2))
+        self.rectangulo.y = self.posicion_inicial_salto - 26.46 * self.tiempo + (gravedad/2 * (self.tiempo**2))
+        self.tiempo += 0.35
         arriba,abajo,_,_ = self.colision_orientacion(self.nivel_actual.suelo_colision,"solidos")
-        if self.angulo > 0:
-            self.angulo += 0.1
-        if self.angulo >= math.pi:
-            self.angulo = 0
+        if self.tiempo > 10.58:
             self.en_salto = False
-        elif self.angulo < math.pi/2:
+        if self.tiempo < 5.29:
             if abajo:
-                self.angulo = math.pi - self.angulo
+                self.tiempo = 10.12 - self.tiempo
         else:
             if arriba:
-                self.angulo = 0
+                self.tiempo = 0
                 self.en_salto = False
 
     def colision_orientacion(self, archivo, objeto):
